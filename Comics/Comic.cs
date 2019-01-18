@@ -8,8 +8,11 @@ namespace ComicBooksAPI.Comics
 {
     public class Comic
     {
-        public int ComicId { get; set; }
+        [Key]
+        public Guid Id { get; set; }
+        
         public string Name { get; set; }
-        public uint Size { get; set; }
+        
+        public int Size { get; set; }
     }
 }

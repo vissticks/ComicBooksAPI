@@ -2,53 +2,65 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ComicBooksAPI.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ComicBooksAPI.Comics
 {
     [Route("api/[controller]")]
     public class ComicsController : Controller
     {
-        private readonly ComicsContext _context;
+        private readonly ComicsService _comics;
 
-        public ComicsController(ComicsContext context)
+        public ComicsController(ComicsService comics)
         {
-            _context = context;
+            _comics = comics;
         }
 
         // GET: api/<controller>
         [HttpGet]
-        public async Task<Comic[]> Get()
+        public async Task<IActionResult> Get()
         {
-            return await _context.Comics.ToArrayAsync();
+            return Ok(await _comics.GetAll());
         }
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return "value";
+            var comic = await _comics.Get(id);
+            if (comic != null)
+            {
+                return Ok(comic);
+            }
+
+            return NotFound();
         }
 
         // POST api/<controller>
         [HttpPost]
-        public void Post([FromBody]Comic comic)
+        public async Task<IActionResult> Post([FromBody] Comic comic)
         {
+            var result = await _comics.Create(comic);
+            return Ok(result);
         }
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] string value)
         {
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
+            var comic = await _comics.Get(id);
+            if (comic == null) return NotFound();
+
+            await _comics.Delete(id);
+            return Ok();
         }
     }
 }

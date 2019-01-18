@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ComicBooksAPI.Comics;
+using ComicBooksAPI.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,6 +40,9 @@ namespace ComicBooksAPI
             });
 
             services.AddDbContext<ComicsContext>(c => c.UseSqlite(Configuration["Comics:ConnectionString"]));
+            
+            // Add Services
+            services.AddTransient<ComicsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

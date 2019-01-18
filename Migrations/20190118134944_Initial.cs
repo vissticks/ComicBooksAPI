@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ComicBooksAPI.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,14 +11,13 @@ namespace ComicBooksAPI.Migrations
                 name: "Comics",
                 columns: table => new
                 {
-                    ComicId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Size = table.Column<uint>(nullable: false)
+                    Size = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comics", x => x.ComicId);
+                    table.PrimaryKey("PK_Comics", x => x.Id);
                 });
         }
 
