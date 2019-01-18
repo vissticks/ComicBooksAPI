@@ -37,8 +37,7 @@ namespace ComicBooksAPI
                 });
             });
 
-            var connectionString = Configuration.GetValue<string>("ConnectionString");
-            services.AddDbContext<ComicsContext>(c => c.UseSqlite(connectionString));
+            services.AddDbContext<ComicsContext>(c => c.UseSqlite(Configuration["Comics:ConnectionString"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
