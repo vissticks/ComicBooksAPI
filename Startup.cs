@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using ComicBooksAPI.Comics;
+using ComicBooksAPI.Comics.Models;
 using ComicBooksAPI.DAL;
+using ComicBooksAPI.Titles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,7 +31,13 @@ namespace ComicBooksAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAutoMapper(Mappings.Map);
+            
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(
+                    options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
             services.AddSwaggerGen(c =>
             {
@@ -40,9 +49,10 @@ namespace ComicBooksAPI
             });
 
             services.AddDbContext<ComicsContext>(c => c.UseSqlite(Configuration["Comics:ConnectionString"]));
-            
+
             // Add Services
             services.AddTransient<ComicsService>();
+            services.AddTransient<TitlesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +67,12 @@ namespace ComicBooksAPI
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ComicBooks API v1");
                     c.RoutePrefix = string.Empty;
                 });
+
+                using (var serviceScope =
+                    app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    serviceScope.ServiceProvider.GetService<ComicsContext>().Database.EnsureCreated();
+                }
             }
             else
             {

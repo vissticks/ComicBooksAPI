@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+using ComicBooksAPI.Comics.Models;
 
-namespace ComicBooksAPI.Comics
+namespace ComicBooksAPI.Titles.Models
 {
-    public class Comic
+    public class Title
     {
         [Key]
         public Guid Id { get; set; }
         
         public string Name { get; set; }
         
-        public int Size { get; set; }
+        public IEnumerable<Comic> Issues { get; set; }
     }
 }

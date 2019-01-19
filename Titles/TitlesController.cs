@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using ComicBooksAPI.Comics.Models;
 using ComicBooksAPI.Exceptions;
+using ComicBooksAPI.Titles.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ComicBooksAPI.Comics
+namespace ComicBooksAPI.Titles
 {
     [Route("api/[controller]")]
-    public class ComicsController : Controller
+    public class TitlesController : Controller
     {
-        private readonly ComicsService _comics;
+        private readonly TitlesService _titles;
         private readonly IMapper _mapper;
 
-        public ComicsController(ComicsService comics, IMapper mapper)
+        public TitlesController(TitlesService titles, IMapper mapper)
         {
-            _comics = comics;
+            _titles = titles;
             _mapper = mapper;
         }
 
@@ -25,8 +24,7 @@ namespace ComicBooksAPI.Comics
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var comics = _mapper.Map<IEnumerable<ComicDto>>(await _comics.GetAllComics());
-            return Ok(comics);
+            return Ok(_mapper.Map<IEnumerable<TitleDto>>(await _titles.GetAllTitles()));
         }
 
         // GET api/<controller>/5
@@ -35,8 +33,8 @@ namespace ComicBooksAPI.Comics
         {
             try
             {
-                var comic = await _comics.GetComic(id);
-                return Ok(_mapper.Map<ComicExtendedDto>(comic));
+                var title = _mapper.Map<TitleExtendedDto>(await _titles.GetTitle(id));
+                return Ok(title);
             }
             catch (NotFoundException)
             {
@@ -46,21 +44,20 @@ namespace ComicBooksAPI.Comics
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ComicDto comic)
+        public async Task<IActionResult> Post([FromBody] TitleDto title)
         {
-            var mapped = _mapper.Map<Comic>(comic);
-            var result = await _comics.Create(mapped);
-            return Ok(_mapper.Map<ComicDto>(result));
+            var result = await _titles.Create(_mapper.Map<Title>(title));
+            return Ok(_mapper.Map<TitleDto>(result));
         }
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, [FromBody] ComicDto value)
+        public async Task<IActionResult> Put(Guid id, [FromBody] TitleDto value)
         {
             try
             {
-                await _comics.Update(id, _mapper.Map<Comic>(value));
-                return Ok(_mapper.Map<ComicExtendedDto>(await _comics.GetComic(id)));
+                await _titles.Update(id, _mapper.Map<Title>(value));
+                return Ok(_mapper.Map<TitleDto>(await _titles.Get(id)));
             }
             catch (NotFoundException)
             {
@@ -74,7 +71,7 @@ namespace ComicBooksAPI.Comics
         {
             try
             {
-                await _comics.Delete(id);
+                await _titles.Delete(id);
                 return Ok();
             }
             catch (NotFoundException)
