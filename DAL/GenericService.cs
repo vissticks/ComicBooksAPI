@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ComicBooksAPI.Exceptions;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace ComicBooksAPI.DAL
@@ -8,7 +10,7 @@ namespace ComicBooksAPI.DAL
     public abstract class GenericService<T> : IGenericService<T> where T : class
     {
         private readonly ComicsContext _context;
-        
+
         public GenericService(ComicsContext context)
         {
             _context = context;
@@ -21,20 +23,33 @@ namespace ComicBooksAPI.DAL
             return obj;
         }
 
+        public async Task Update(Guid id, T changes)
+        {
+            var comic = await Get(id);
+            _context.Entry(comic).CurrentValues.SetValues(changes);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task Delete(Guid id)
         {
             var obj = await _context.FindAsync<T>(id);
-            if (obj != null)
+            if (obj == null)
             {
-                _context.Remove(obj);
+                throw new NotFoundException($"entity with id '{id}'");
             }
 
+            _context.Remove(obj);
             await _context.SaveChangesAsync();
         }
 
         public async Task<T> Get(Guid id)
         {
-            return await _context.FindAsync<T>(id);
+            var obj = await _context.FindAsync<T>(id);
+            if (obj == null)
+            {
+                throw new NotFoundException($"entity with id '{id}'");
+            }
+            return obj;
         }
 
         public async Task<IEnumerable<T>> GetAll()

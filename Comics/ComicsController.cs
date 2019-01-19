@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBooksAPI.DAL;
+using ComicBooksAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,13 +30,15 @@ namespace ComicBooksAPI.Comics
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var comic = await _comics.Get(id);
-            if (comic != null)
+            try
             {
+                var comic = await _comics.Get(id);
                 return Ok(comic);
             }
-
-            return NotFound();
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
 
         // POST api/<controller>
@@ -48,19 +51,32 @@ namespace ComicBooksAPI.Comics
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(Guid id, [FromBody] Comic value)
         {
+            try
+            {
+                await _comics.Update(id, value);
+                return Ok(await _comics.Get(id));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var comic = await _comics.Get(id);
-            if (comic == null) return NotFound();
-
-            await _comics.Delete(id);
-            return Ok();
+            try
+            {
+                await _comics.Delete(id);
+                return Ok();
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }
