@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using ComicBooksAPI.Comics.Models;
 using ComicBooksAPI.Exceptions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBooksAPI.Comics
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class ComicsController : Controller
     {

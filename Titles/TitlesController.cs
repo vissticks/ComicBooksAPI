@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using ComicBooksAPI.Exceptions;
 using ComicBooksAPI.Titles.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBooksAPI.Titles
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class TitlesController : Controller
     {
