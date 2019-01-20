@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.IO;
 
 namespace ComicBooksAPI
 {
@@ -103,11 +104,18 @@ namespace ComicBooksAPI
         {
             if (env.IsDevelopment())
             {
+                app.UseCors(c => c.AllowAnyOrigin());
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ComicBooks API v1");
+                    var config = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("hosting.json", optional: false)
+                        .Build();
+
+                    c.SwaggerEndpoint(config["Urls"].Split(';').First(url => url.StartsWith("https"))
+                        + "/swagger/v1/swagger.json", "ComicBooks API v1");
                     c.RoutePrefix = string.Empty;
                 });
 
