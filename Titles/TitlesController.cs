@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ComicBooksAPI.Titles
 {
     [Authorize]
+    [Produces("application/json")]
+    [Consumes("application/json")]
     [Route("api/[controller]")]
     public class TitlesController : Controller
     {

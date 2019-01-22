@@ -104,7 +104,10 @@ namespace ComicBooksAPI
         {
             if (env.IsDevelopment())
             {
-                app.UseCors(c => c.AllowAnyOrigin());
+                app.UseCors(c => {
+                    c.AllowAnyOrigin();
+                    c.AllowAnyHeader();
+                });
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>

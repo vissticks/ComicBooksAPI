@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace ComicBooksAPI.Users
 {
+    [Produces("application/json")]
+    [Consumes("application/json")]
     [Route("api/[controller]/[action]")]
     public class AuthController : Controller
     {
