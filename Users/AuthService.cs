@@ -66,9 +66,9 @@ public class AuthService : GenericService<User>
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(ClaimTypes.Name, user.UserName)
         };
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]));
@@ -77,8 +77,8 @@ public class AuthService : GenericService<User>
         var tokeOptions = new JwtSecurityToken(
             issuer: "https://localhost:5001",
             audience: "https://localhost:5001",
-            claims: new List<Claim>(),
-            expires: DateTime.Now.AddMinutes(5),
+            claims: claims,
+            expires: DateTime.Now.AddHours(24),
             signingCredentials: signinCredentials
         );
 

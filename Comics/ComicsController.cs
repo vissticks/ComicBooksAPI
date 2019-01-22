@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComicBooksAPI.Comics.Models;
 using ComicBooksAPI.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace ComicBooksAPI.Comics
 {
@@ -51,11 +56,16 @@ namespace ComicBooksAPI.Comics
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ComicDto comic)
+        [RequestSizeLimit(100_000_000)] // ~100 mb
+        [Consumes("multipart/form-data")]
+        public IActionResult Post([FromForm] List<IFormFile> files)
         {
-            var mapped = _mapper.Map<Comic>(comic);
-            var result = await _comics.Create(mapped);
-            return Ok(_mapper.Map<ComicDto>(result));
+            var user = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            foreach (var file in files)
+            {
+
+            }
+            return Ok(user);
         }
 
         // PUT api/<controller>/5
